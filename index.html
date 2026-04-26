@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
+
+     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calculadora">
+
+    <link rel="apple-touch-icon" href="imagen.png">
+    
+
+    <title>Calculadora de semanas</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 90%; max-width: 350px; text-align: center; }
+        h2 { color: #333; font-size: 1.5rem; margin-bottom: 20px; }
+        label { display: block; text-align: left; margin-bottom: 8px; color: #777; font-size: 0.9rem; }
+        /* Estilo para que el input se vea grande y fácil de tocar */
+        input[type="date"] { 
+            width: 100%; padding: 15px; border: 2px solid #007bff; border-radius: 12px; 
+            font-size: 1.1rem; box-sizing: border-box; margin-bottom: 20px; color: #333;
+        }
+        button { 
+            width: 100%; padding: 18px; background: #007bff; color: white; border: none; 
+            border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; 
+        }
+        #resultado { margin-top: 25px; padding: 15px; border-radius: 15px; background: #f0f7ff; min-height: 80px; color: #222; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>⏳ ¿Cuánto falta?</h2>
+    
+    <label>Toca para elegir día y mes:</label>
+    <!-- Un solo clic abre el calendario del celular -->
+    <input type="date" id="fechaDestino">
+
+    <button onclick="calcular()">Calcular Ahora</button>
+
+    <div id="resultado">
+        <div id="textoRes">Elige una fecha</div>
+    </div>
+</div>
+
+<script>
+    // Al abrir la app, ponemos el año actual automáticamente
+    window.onload = function() {
+        const hoy = new Date();
+        const anio = hoy.getFullYear();
+        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoy.getDate()).padStart(2, '0');
+        
+        // Esto hace que el calendario ya aparezca situado en el año actual
+        document.getElementById('fechaDestino').value = `${anio}-${mes}-${dia}`;
+    };
+
+    function esBisiesto(year) {
+        return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    }
+
+    function calcular() {
+        const ahora = new Date();
+        ahora.setHours(0,0,0,0); // Normalizamos hoy a medianoche
+
+        const input = document.getElementById('fechaDestino').value;
+        if (!input) return;
+
+        let fechaDestino = new Date(input + "T00:00:00"); // Evita errores de zona horaria
+        let anio = fechaDestino.getFullYear();
+
+        // Si la fecha elegida ya pasó este año, avisamos o ajustamos
+        const diffMilisegundos = fechaDestino - ahora;
+        const totalDias = Math.floor(diffMilisegundos / (1000 * 60 * 60 * 24));
+
+        if (totalDias < 0) {
+            document.getElementById('textoRes').innerHTML = "<span style='color:red'>La fecha ya pasó. Elige una futura.</span>";
+            return;
+        }
+
+        const semanas = Math.floor(totalDias / 7);
+        const diasRestantes = totalDias % 7;
+
+        let avisoBisiesto = esBisiesto(anio) ? "<br><small style='color:#28a745'>✨ Incluye año bisiesto (" + anio + ")</small>" : "";
+
+        document.getElementById('textoRes').innerHTML = 
+            `Faltan:<br><b style='font-size:1.4rem'>${semanas} semanas</b><br>y <b>${diasRestantes} días</b><br>` +
+            `<small>(${totalDias} días en total)</small>` + avisoBisiesto;
+    }
+
+    if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('Service Worker registrado', reg))
+      .catch(err => console.warn('Error al registrar SW', err));
+  });
+}
+</script>
+
+   
+</body>
+</html>

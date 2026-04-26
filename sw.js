@@ -1,6 +1,6 @@
 const CACHE_NAME = 'calculadora-v1';
 const urlsToCache = [
-  'principio.html',
+  'index.html',
   'manifest.json',
   'imagen.png'
 ];

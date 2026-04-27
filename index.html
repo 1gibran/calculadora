@@ -40,9 +40,8 @@
     
     <label>Toca para elegir día y mes:</label>
     <!-- Un solo clic abre el calendario del celular -->
-    <input type="date" id="fechaDestino">
+   <input type="date" id="fechaDestino" oninput="calcular()">
 
-    <button onclick="calcular()">Calcular Ahora</button>
 
     <div id="resultado">
         <div id="textoRes">Elige una fecha</div>
@@ -51,15 +50,18 @@
 
 <script>
     // Al abrir la app, ponemos el año actual automáticamente
-    window.onload = function() {
-        const hoy = new Date();
-        const anio = hoy.getFullYear();
-        const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-        const dia = String(hoy.getDate()).padStart(2, '0');
-        
-        // Esto hace que el calendario ya aparezca situado en el año actual
-        document.getElementById('fechaDestino').value = `${anio}-${mes}-${dia}`;
-    };
+   window.onload = function() {
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    
+    const fechaHoy = `${anio}-${mes}-${dia}`;
+    document.getElementById('fechaDestino').value = fechaHoy;
+
+    // Esto hace que el cálculo aparezca en cuanto abres la app
+    calcular(); 
+};
 
     function esBisiesto(year) {
         return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
